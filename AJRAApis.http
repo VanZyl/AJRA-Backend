@@ -1,0 +1,7 @@
+@AJRAApis_HostAddress = http://localhost:5146
+# @AJRAApis_HostAddress = http://192.168.0.185:5146
+
+GET {{AJRAApis_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
