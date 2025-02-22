@@ -42,5 +42,12 @@ namespace AJRAApis.Controllers
             var redbookSummary = await _redbookRepo.GetRedbookSummaryAsync(employeeId, startdate, enddate);
             return Ok(redbookSummary);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var redbook = await _redbookRepo.GetByIdAsync(id);
+            return Ok(redbook);
+        }
     }
 }

@@ -1,0 +1,1 @@
+ docker build -t ajra-backend:v1.0.0 .
