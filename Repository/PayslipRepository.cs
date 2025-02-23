@@ -759,7 +759,7 @@ namespace AJRAApis.Repository
             };
             QuestPDF.Settings.License = LicenseType.Community;
             string employeeName = payslip.Name + " " + payslip.Surname;
-            string baseDirectory = @"/app/pdfs";
+            string baseDirectory = @"/usr/pdfs";
 
             string folderName = payslip.PaySlipDate.ToString("MMMM yyyy");
             string FolderPath = Path.Combine(baseDirectory, folderName);
@@ -1052,7 +1052,7 @@ namespace AJRAApis.Repository
         public async Task<IFormFile> GetPayslipPDFAsync(List<PayslipDto> payslips, string payslipcycle){
             QuestPDF.Settings.License = LicenseType.Community;
             var stream = new MemoryStream();
-            string baseDirectory = @"/app/pdfs";
+            string baseDirectory = @"/usr/pdfs";
             string folderName = payslips[0].PaySlipDate.ToString("MMMM yyyy");
             string FolderPath = Path.Combine(baseDirectory, folderName);
             var pdfFiles = Directory.GetFiles(FolderPath, "*.pdf");

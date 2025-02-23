@@ -63,9 +63,11 @@ namespace AJRAApis.Repository
             return await _context.Redbook.ToListAsync();
         }
 
-        public async Task<List<Redbook>> GetByIdAsync(string id)
+        public async Task<List<Redbook>> GetBySpecificID(string employeeId)
         {
-            return await _context.Redbook.Where(p => p.EmployeeId == id).ToListAsync();
+            return await _context.Redbook
+            .Where(r => r.EmployeeId == employeeId)
+            .ToListAsync();
         }
 
         public async Task<List<Redbook>> GetRedbookSummaryAsync(string employeeId, string startdate, string enddate)

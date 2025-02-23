@@ -13,6 +13,6 @@ namespace AJRAApis.Interfaces
         Task<Redbook> AddAsync(RedbookDto redbook);
         Task<List<Redbook>> GetRedbookSummaryAsync(string employeeId, string startdate, string enddate);
 
-        Task<List<Redbook>> GetByIdAsync(string id);
+        Task<List<Redbook>> GetBySpecificID(string employeeId);
     }
 }

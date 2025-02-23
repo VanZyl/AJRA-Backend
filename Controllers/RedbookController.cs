@@ -7,6 +7,7 @@ using AJRAApis.Interfaces;
 using AJRAApis.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Mono.Unix.Native;
 
 namespace AJRAApis.Controllers
 {
@@ -43,10 +44,14 @@ namespace AJRAApis.Controllers
             return Ok(redbookSummary);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        [HttpGet("employee")]
+        public async Task<IActionResult> GetById([FromQuery] string employeeId)
         {
-            var redbook = await _redbookRepo.GetByIdAsync(id);
+            if (string.IsNullOrEmpty(employeeId))
+            {
+                return BadRequest("Employee ID is required");
+            }
+            var redbook = await _redbookRepo.GetBySpecificID(employeeId);
             return Ok(redbook);
         }
     }

@@ -30,7 +30,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>  // Need to add this on your own
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnectionString"));
+    // options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddScoped<iEmployeeRepository,EmployeeRepository>();   
