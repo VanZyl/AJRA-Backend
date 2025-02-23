@@ -30,6 +30,7 @@ namespace AJRAApis.Dtos.Payslips
         public float Wastages { get; set; }
         public float OtherDeductions { get; set; }
         public float NetAmount { get; set; }
+        public float LeaveBF { get; set; }
         public float LeaveAcc { get; set; }
         public float LeaveHoursWorked { get; set; }
         public float LeaveAmountPaid { get; set; }

@@ -83,17 +83,17 @@ namespace AJRAApis.Controllers
                 // If the database is not empty, retrieve the last Id, increment it, and create the new object.
                 
                 // Retrieve the maximum Id from the database.
-                // var lastId = _context.EmployeeLeave
-                //                     .OrderByDescending(el => el.Id) // Order by Id in descending order.
-                //                     .Select(el => int.Parse(el.Id)) // Parse the Id to an integer.
-                //                     .FirstOrDefault(); // Get the first (largest) Id.
-                // Console.WriteLine(lastId);
                 var lastId = _context.EmployeeLeave
                     .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
                     .ThenByDescending(el => el.Id)        // Then order lexicographically.
                     .Select(el => el.Id)                  // Select the Id as string.
                     .FirstOrDefault();                    // Get the first (largest) Id.
 
+                float DaysDue = _context.EmployeeLeave
+                                .Where(e => e.EmployeeId == employeeLeave.EmployeeId)
+                                .OrderByDescending(e => e.Id)
+                                .Select(e => e.DaysDue)
+                                .FirstOrDefault();
 
                 // Increment the Id.
                 var newId = (int.Parse(lastId) + 1).ToString(); // Convert the incremented Id back to a string.
@@ -109,9 +109,22 @@ namespace AJRAApis.Controllers
                     DateTo = employeeLeave.DateTo,
                     DaysTaken = employeeLeave.DaysTaken,
                     DaysAccrued = employeeLeave.DaysAccrued,
-                    DaysDue = employeeLeave.DaysDue,
+                    DaysDue = DaysDue  + employeeLeave.DaysAccrued - employeeLeave.DaysTaken,
                     Remarks = employeeLeave.Remarks
                 };
+
+                var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == employeeLeave.EmployeeId);
+                var leave = DaysDue + employeeLeave.DaysAccrued - employeeLeave.DaysTaken; //- payslip.LeaveTaken;
+                if(leave < 0)
+                {
+                    return BadRequest("Insufficient leave balance");
+                }
+                if(employee == null)
+                {
+                    return BadRequest("Employee not found");
+                }
+                employee.Leave = leave;
+                await _context.SaveChangesAsync();
 
                 // Save the new EmployeeLeave object to the database.
                 await _employeeRepo.CreateAsync(newemployeeLeave);

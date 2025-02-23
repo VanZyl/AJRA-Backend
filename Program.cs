@@ -14,10 +14,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("MyPolicy",
         policy =>
         {
-            // policy.WithOrigins("http://localhost");
-            policy.WithOrigins("http://192.168.0.181:4201")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+            // policy.WithOrigins("http://localhost:4200")
+            // policy.WithOrigins("http://192.168.0.181:4201")
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
                 // .AllowCredentials();
         });
 });
@@ -30,8 +31,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>  // Need to add this on your own
 {
-    // options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnectionString"));
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnectionString"));
+    // options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddScoped<iEmployeeRepository,EmployeeRepository>();   

@@ -21,6 +21,7 @@ using System.ComponentModel;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using Org.BouncyCastle.Pqc.Crypto.Frodo;
+using AJRAApis.Dtos.EmployeeLeave;
 
 
 namespace AJRAApis.Repository
@@ -194,6 +195,12 @@ namespace AJRAApis.Repository
 
                 var NetIncome = Math.Round(GrossIncome - UIF - BargainingCouncil - uniforms - tillshortage - wastage - otherdeductions,2,MidpointRounding.ToEven);
 
+                float LeaveBF = _context.EmployeeLeave
+                                .Where(e => e.EmployeeId == employeeId)
+                                .OrderByDescending(e => e.Id)
+                                .Select(e => e.DaysDue)
+                                .FirstOrDefault();
+
                 var LeaveAccumulated = Math.Round(((NormalHoursWorked + OvertimeHoursWorked + PublicHolidayHoursWorked)/8.0)/17.0,2,MidpointRounding.ToEven);
 
 
@@ -212,6 +219,8 @@ namespace AJRAApis.Repository
                     FirstName = nameofperson[0];
                     Surname = nameofperson[1];
                 }
+
+                
 
                 PayslipSummaryDto? payslip = null;
                 
@@ -237,6 +246,7 @@ namespace AJRAApis.Repository
                         BarganingCouncil = (float)BargainingCouncil,
                         NetAmount = (float)NetIncome,
                         LeaveAcc = (float)LeaveAccumulated,
+                        LeaveBF = (float)LeaveBF,
                         LeaveTaken = (float)totalLeaveDays,
                         LeaveAmountPaid = (float)leaveAmount,
                         LeaveHoursWorked = (float)leaveHours,
@@ -262,6 +272,7 @@ namespace AJRAApis.Repository
                         BarganingCouncil = 0,
                         NetAmount = Salary,
                         LeaveAcc = 0,
+                        LeaveBF = 0,
                         LeaveAmountPaid = 0,
                         LeaveHoursWorked = 0,
                         PaySlipCycle = payslip_id.Split('-')[1],
@@ -743,20 +754,7 @@ namespace AJRAApis.Repository
 
             // Increment the Id.
             var newId = (lastId + 1).ToString(); // Convert the incremented Id back to a string.
-
-            var leaveAccumulated = new EmployeeLeave
-            {
-                Id = newId,
-                EmployeeId = payslip.EmployeeId,
-                TransCode = "001",
-                Description = "Leave Accumulated",
-                DateFrom = DateOnly.Parse(startdate),
-                DateTo = DateOnly.Parse(enddate),
-                DaysAccrued = (int)payslip.LeaveAcc,
-                DaysDue = (int)payslip.LeaveAcc+(int)payslip.LeaveAcc,
-                DaysTaken = 0,
-                Remarks = "Leave Accumulated for the month of " + DateTime.Now.ToString("MMMM yyyy")
-            };
+           
             QuestPDF.Settings.License = LicenseType.Community;
             string employeeName = payslip.Name + " " + payslip.Surname;
             string baseDirectory = @"/usr/pdfs";
@@ -1015,6 +1013,34 @@ namespace AJRAApis.Repository
             })
             .GeneratePdf(filePath);
 
+              // Retrieve the maximum Id from the database.
+            var leaveid = _context.EmployeeLeave
+                .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
+                .ThenByDescending(el => el.Id)        // Then order lexicographically.
+                .Select(el => el.Id)                  // Select the Id as string.
+                .FirstOrDefault();                    // Get the first (largest) Id.
+
+
+            // Increment the Id.
+            var newleaveid = (int.Parse(leaveid) + 1).ToString(); // Convert the incremented Id back to a string.
+
+            var leaveentry = new EmployeeLeave
+            {
+                Id = newleaveid,
+                EmployeeId = payslip.EmployeeId,
+                TransCode = "001",
+                Description = "Leave Accured",
+                DateFrom = DateOnly.Parse(startdate),
+                DateTo = DateOnly.Parse(enddate),
+                DaysAccrued = payslip.LeaveAcc,
+                DaysDue = (float)(payslip.LeaveBF + payslip.LeaveAcc),
+                DaysTaken = (int)payslip.LeaveTaken,
+                Remarks = "Leave Taken for the month of " + DateTime.Now.ToString("MMMM yyyy")
+            };
+
+            await _context.EmployeeLeave.AddAsync(leaveentry);
+            await _context.SaveChangesAsync();
+
             Console.WriteLine("PDF generated successfully!");
             return payslip;
         }
@@ -1024,7 +1050,7 @@ namespace AJRAApis.Repository
             await _context.SaveChangesAsync();
 
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == payslip.EmployeeId);
-            var leave = payslip.LeaveAcc + payslip.LeaveBF - payslip.LeaveTaken;
+            var leave = payslip.LeaveAcc + payslip.LeaveBF; //- payslip.LeaveTaken;
             if(employee == null)
                 return null;
             employee.Leave = leave;
