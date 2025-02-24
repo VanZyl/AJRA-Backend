@@ -580,8 +580,8 @@ namespace AJRAApis.Repository
                             DaysWorked.Add("Current Day: " + currentDay.Value.ToString().Split(" ")[0] + " Clockin: " + firstClockIn.Value + " Clockout: " + lastClockOut.Value + " Total Hours: " + total_hours + " IsSunday:"+isSunday(currentDay.Value) + " IsHoliday:"+isHoliday(currentDay.Value, holidays));
                         }else{
                             total_hours = lastClockOut.Value - firstClockIn.Value - TimeSpan.FromHours(1);
-                            // DaysWorked.Add("Current Day: " + currentDay.Value.ToString().Split(" ")[0] + " Clockin: " + firstClockIn.Value + " Clockout: " + lastClockOut.Value + " Total Hours: " + total_hours + " IsSunday:"+isSunday(currentDay.Value) + " IsHoliday:"+isHoliday(currentDay.Value, holidays));
-                            Console.WriteLine("Current Day: " + currentDay.Value + " Clockin: " + firstClockIn.Value + " Clockout: " + lastClockOut.Value + " Total Hours: " + total_hours);
+                            DaysWorked.Add("Current Day: " + currentDay.Value.ToString().Split(" ")[0] + " Clockin: " + firstClockIn.Value + " Clockout: " + lastClockOut.Value + " Total Hours: " + total_hours + " IsSunday:"+isSunday(currentDay.Value) + " IsHoliday:"+isHoliday(currentDay.Value, holidays));
+                            // Console.WriteLine("Current Day: " + currentDay.Value + " Clockin: " + firstClockIn.Value + " Clockout: " + lastClockOut.Value + " Total Hours: " + total_hours);
                         }
                     }else if(firstClockIn.Value.TimeOfDay >= TimeSpan.FromHours(13)){
                         if(firstClockIn.Value.TimeOfDay < TimeSpan.FromHours(18)){
