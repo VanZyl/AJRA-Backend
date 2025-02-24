@@ -1035,7 +1035,7 @@ namespace AJRAApis.Repository
                 DaysAccrued = payslip.LeaveAcc,
                 DaysDue = (float)(payslip.LeaveBF + payslip.LeaveAcc),
                 DaysTaken = (int)payslip.LeaveTaken,
-                Remarks = "Leave Taken for the month of " + DateTime.Now.ToString("MMMM yyyy")
+                Remarks = "Leave Accrued for the month of " + DateTime.Now.ToString("MMMM yyyy")
             };
 
             await _context.EmployeeLeave.AddAsync(leaveentry);
