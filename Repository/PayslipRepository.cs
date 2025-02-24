@@ -116,7 +116,7 @@ namespace AJRAApis.Repository
                         NormalHoursWorked += time;
                     }
                 }
-
+                Console.WriteLine("Calculating Data");
                 // Calculate the pay for each type of work
                 var NormalHoursPay = Math.Round(NormalHoursWorked * hourlyRate,2,MidpointRounding.ToEven);
                 var OvertimeHoursPay = Math.Round(OvertimeHoursWorked * hourlyRate * 1.5,2,MidpointRounding.ToEven);
@@ -484,6 +484,7 @@ namespace AJRAApis.Repository
 
                 foreach (var entry in rowData)
                 {
+                    Console.WriteLine("Start of for loop: " + entry["ClockinDate"] + " " + entry["ClockinTime"] + " " + entry["ClockoutDate"] + " " + entry["ClockoutTime"]);
                     var start = ParseDateTime(entry["ClockinDate"], entry["ClockinTime"]);
                     DateTime? end = string.IsNullOrEmpty(entry["ClockoutDate"]) || string.IsNullOrEmpty(entry["ClockoutTime"]) ? (DateTime?) null: ParseDateTime(entry["ClockoutDate"], entry["ClockoutTime"]);
                     if (end == null){
@@ -493,12 +494,14 @@ namespace AJRAApis.Repository
                         endCheckOut = null;
                         endCheckIn = null;
                     }
+                    Console.WriteLine("Processing worker data 2");
 
                     if(currentDay == null){
                         currentDay = start.Date;
                         firstClockIn = start;
                         lastClockOut = end;
                     }else if(currentDay != start.Date){
+                        Console.WriteLine("Processing worker data 3");
                         if (lastClockOut == null){
                             if (IsSundayorHoliday(currentDay.Value, holidays)){
                                 lastClockOut = new DateTime(currentDay.Value.Year, currentDay.Value.Month, currentDay.Value.Day, 20, 30, 0);
@@ -532,8 +535,8 @@ namespace AJRAApis.Repository
                             }
                         }
 
-
-                        if (total_hours == TimeSpan.FromHours(0)){
+                        Console.WriteLine("Processing worker data 4");
+                        if (total_hours == TimeSpan.FromHours(0) || total_hours == null || total_hours < TimeSpan.FromHours(1)){
                             workday = new DateTime(currentDay.Value.Year, currentDay.Value.Month, currentDay.Value.Day, 0, 0, 0);
                         }
                         else{
@@ -545,7 +548,9 @@ namespace AJRAApis.Repository
                         currentDay = start.Date;
                         firstClockIn = start;
                         lastClockOut = end;
+                        Console.WriteLine("Processing worker data 4.1");
                     }else{
+                        Console.WriteLine("Processing worker data 4.2");
                         if(endCheckOut != null){
                             if(endCheckIn.Value.TimeOfDay > TimeSpan.FromHours(19.5)){
                                 lastClockOut = endCheckIn;
@@ -555,10 +560,11 @@ namespace AJRAApis.Repository
                         }else{
                             lastClockOut = end;
                         }
+                        Console.WriteLine("Processing worker data 4.3");
                     }
                 
                 }
-
+                Console.WriteLine("Processing worker data 5");
                 if(firstClockIn != null){
                     if (lastClockOut == null){
                         if (IsSundayorHoliday(currentDay.Value, holidays)){
@@ -572,7 +578,7 @@ namespace AJRAApis.Repository
 
                     TimeSpan? total_hours = null;
                     DateTime? workday = null;
-
+                    Console.WriteLine("Processing worker data 6");
                     if (firstClockIn.Value.TimeOfDay < TimeSpan.FromHours(13) ){
                         if(lastClockOut.Value.TimeOfDay < TimeSpan.FromHours(13)){
                             total_hours = lastClockOut.Value - firstClockIn.Value;
@@ -592,7 +598,7 @@ namespace AJRAApis.Repository
                             total_hours = TimeSpan.FromHours(0);
                         }
                     }
-
+                    Console.WriteLine("Processing worker data 1");
                     if (total_hours == TimeSpan.FromHours(0)){
                         workday = new DateTime(currentDay.Value.Year, currentDay.Value.Month, currentDay.Value.Day, 0, 0, 0);
                     }
