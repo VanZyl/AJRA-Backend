@@ -536,6 +536,8 @@ namespace AJRAApis.Repository
                         }
 
                         Console.WriteLine("Processing worker data 4");
+
+                        /*TODO: Need to provide a case where the time is less than an hour*/
                         if (total_hours == TimeSpan.FromHours(0) || total_hours == null || total_hours < TimeSpan.FromHours(1)){
                             workday = new DateTime(currentDay.Value.Year, currentDay.Value.Month, currentDay.Value.Day, 0, 0, 0);
                         }
