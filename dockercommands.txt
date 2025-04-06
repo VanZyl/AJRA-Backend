@@ -1,5 +1,5 @@
 For API Remeber to increment the version:
     1.1) docker build --no-cache -t ajra-backend:v1.0.0 .
     OR
-    1.2) docker build -t ajra-backend:v1.0.0 .
-    2) docker run -d --network ajranetwork -v ajra_files:/usr/pdfs -p 50000:8080 -p 50001:8081 --restart=always ajra-backend:v1.0.1
+    1.2) docker build -t ajra-backend:v1.0.2 .
+    2) docker run -d --network ajranetwork -v ajra_files:/usr/pdfs -p 50000:8080 -p 50001:8081 --restart=always ajra-backend:v1.0.2
