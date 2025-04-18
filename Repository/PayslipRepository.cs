@@ -298,7 +298,7 @@ namespace AJRAApis.Repository
             // Fetch all Payslip IDs for the employee
             var lastPayslip = _context.PaySlips
                 .Where(p => p.EmployeeId == employeeId)
-                .OrderByDescending(p => p.PaySlipCycle) // Ensure we get the latest one
+                .OrderByDescending(p => p.PaySlipDate) // Ensure we get the latest one
                 .Select(p => p.Id)
                 .FirstOrDefault();
 
