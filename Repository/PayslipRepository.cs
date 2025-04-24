@@ -672,6 +672,8 @@ namespace AJRAApis.Repository
                 (1, 1),   // New Year's Day
                 (3, 21),  // Human Rights Day
                 (4, 18),  // Good Friday
+                (4, 21),  // Family Day
+                (4, 27),  // Freedom Day
                 (4, 28),  // Freedom Day
                 (5, 1),   // Workers' Day
                 (6, 16),  // Youth Day
