@@ -13,6 +13,7 @@ namespace AJRAApis.Mappers
         {
             return new EmployeeLeaveDto
             {
+                Id = employees.Id,
                 TransCode = employees.TransCode,
                 EmployeeId = employees.EmployeeId,
                 Description = employees.Description,

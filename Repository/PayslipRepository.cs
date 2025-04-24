@@ -748,6 +748,7 @@ namespace AJRAApis.Repository
             var lastEntry = _context.EmployeeLeave
                 .Where(l => l.EmployeeId == payslip.EmployeeId) // Filter for leave taken transactions
                 .OrderByDescending(l => Convert.ToInt32(l.Id)) // Order by DateTo in descending order
+                .OrderByDescending(l => l.DateFrom) // Order by Id in descending order
                 .FirstOrDefault(); // Get the most recent entry or null if no records
 
             if (lastEntry != null)
