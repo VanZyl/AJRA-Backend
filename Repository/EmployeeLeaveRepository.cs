@@ -29,7 +29,7 @@ namespace AJRAApis.Repository
         {
             return await _context.EmployeeLeave
                         .Where(x => x.EmployeeId == Employeeid)
-                        .OrderBy(x => x.Id)
+                        .OrderBy(x => Convert.ToInt32(x.Id))
                         .Select(x =>x.ToEmployeeLeaveDto())
                         .ToListAsync();
 

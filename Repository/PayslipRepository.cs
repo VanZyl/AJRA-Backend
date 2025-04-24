@@ -197,7 +197,7 @@ namespace AJRAApis.Repository
 
                 float LeaveBF = _context.EmployeeLeave
                                 .Where(e => e.EmployeeId == employeeId)
-                                .OrderByDescending(e => e.Id)
+                                .OrderByDescending(e => Convert.ToInt32(e.Id)) // Order by Id in descending order
                                 .Select(e => e.DaysDue)
                                 .FirstOrDefault();
 
@@ -747,7 +747,7 @@ namespace AJRAApis.Repository
             // Find the last entry for the specific employee
             var lastEntry = _context.EmployeeLeave
                 .Where(l => l.EmployeeId == payslip.EmployeeId) // Filter for leave taken transactions
-                .OrderByDescending(l => l.Id) // Order by DateTo in descending order
+                .OrderByDescending(l => Convert.ToInt32(l.Id)) // Order by DateTo in descending order
                 .FirstOrDefault(); // Get the most recent entry or null if no records
 
             if (lastEntry != null)
@@ -762,7 +762,7 @@ namespace AJRAApis.Repository
             }
                             // Retrieve the maximum Id from the database.
             var lastId = _context.EmployeeLeave
-                                .OrderByDescending(el => el.Id) // Order by Id in descending order.
+                                .OrderByDescending(el => Convert.ToInt32(el.Id)) // Order by Id in descending order.
                                 .Select(el => int.Parse(el.Id)) // Parse the Id to an integer.
                                 .FirstOrDefault(); // Get the first (largest) Id.
 
@@ -1027,20 +1027,20 @@ namespace AJRAApis.Repository
             })
             .GeneratePdf(filePath);
 
-              // Retrieve the maximum Id from the database.
-            var leaveid = _context.EmployeeLeave
-                .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
-                .ThenByDescending(el => el.Id)        // Then order lexicographically.
-                .Select(el => el.Id)                  // Select the Id as string.
-                .FirstOrDefault();                    // Get the first (largest) Id.
+            //   // Retrieve the maximum Id from the database.
+            // var leaveid = _context.EmployeeLeave
+            //     .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
+            //     .ThenByDescending(el => el.Id)        // Then order lexicographically.
+            //     .Select(el => el.Id)                  // Select the Id as string.
+            //     .FirstOrDefault();                    // Get the first (largest) Id.
 
 
-            // Increment the Id.
-            var newleaveid = (int.Parse(leaveid) + 1).ToString(); // Convert the incremented Id back to a string.
+            // // Increment the Id.
+            // var newleaveid = (int.Parse(leaveid) + 1).ToString(); // Convert the incremented Id back to a string.
 
             var leaveentry = new EmployeeLeave
             {
-                Id = newleaveid,
+                Id = newId,
                 EmployeeId = payslip.EmployeeId,
                 TransCode = "001",
                 Description = "Leave Accured",
@@ -1048,7 +1048,7 @@ namespace AJRAApis.Repository
                 DateTo = DateOnly.Parse(enddate),
                 DaysAccrued = payslip.LeaveAcc,
                 DaysDue = (float)(payslip.LeaveBF + payslip.LeaveAcc),
-                DaysTaken = (int)payslip.LeaveTaken,
+                DaysTaken = 0,  // This value must be zero because leave taken is entered manually
                 Remarks = "Leave Accrued for the month of " + DateTime.Now.ToString("MMMM yyyy")
             };
 
