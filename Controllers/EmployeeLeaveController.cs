@@ -51,7 +51,8 @@ namespace AJRAApis.Controllers
             // Check if the input object is null and return a BadRequest response if it is.
             if (employeeLeave == null)
             {
-                return BadRequest();
+                Console.WriteLine("Invalid employee leave data.");
+                return BadRequest("Employee leave data is empty.");
             }
 
             // Retrieve all employee leaves from the database and check if the table is empty.
@@ -81,22 +82,26 @@ namespace AJRAApis.Controllers
             else
             {
                 // If the database is not empty, retrieve the last Id, increment it, and create the new object.
-                
+
                 // Retrieve the maximum Id from the database.
-                var lastId = _context.EmployeeLeave
-                    .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
-                    .ThenByDescending(el => el.Id)        // Then order lexicographically.
-                    .Select(el => el.Id)                  // Select the Id as string.
-                    .FirstOrDefault();                    // Get the first (largest) Id.
+                int lastId = _context.EmployeeLeave
+                        .Select(el => el.Id)                // Only select the string IDs from DB
+                        .AsEnumerable()                     // Switch to LINQ-to-Objects
+                        .Where(id => int.TryParse(id, out _)) // Filter out non-numeric stringss
+                        .Select(id => int.Parse(id))       // Now parse safely on the client
+                        .OrderByDescending(id => id)       // Order numerically
+                        .FirstOrDefault();                 // Get max ID as integer (0 if none)
 
                 float DaysDue = _context.EmployeeLeave
                                 .Where(e => e.EmployeeId == employeeLeave.EmployeeId)
-                                .OrderByDescending(e => e.Id)
+                                .AsEnumerable() // Switch to client-side
+                                .Where(e => int.TryParse(e.Id, out _)) // Only valid numeric IDs
+                                .OrderByDescending(e => int.Parse(e.Id)) // Now parse safely
                                 .Select(e => e.DaysDue)
                                 .FirstOrDefault();
 
                 // Increment the Id.
-                var newId = (int.Parse(lastId) + 1).ToString(); // Convert the incremented Id back to a string.
+                var newId = (lastId + 1).ToString(); // Convert the incremented Id back to a string.
 
                 // Create a new EmployeeLeave object with the incremented Id and passed-in information.
                 var newemployeeLeave = new EmployeeLeave

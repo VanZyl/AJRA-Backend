@@ -9,6 +9,7 @@ using AJRAApis.Dtos.Employees;
 using AJRAApis.Dtos.Payslips;
 using AJRAApis.Interfaces;
 using AJRAApis.Mappers;
+using AJRAApis.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
@@ -85,6 +86,13 @@ namespace AJRAApis.Controllers
         {
             var payslip = await _payslipRepo.GetPayslipByIDAsync(id);
             return Ok(payslip);
+        }
+
+        [HttpPost("rerundeductions")]
+        public async Task<IActionResult> ReRunDeductions([FromBody] PayslipDeductionDto payslip)   // Maak n nuwe DTO vir die rerun deductions wat net die nodige properties het, maak hierdie n get function wat net die employee id en die payslip date gee
+        {
+            var updated_payslip = await _payslipRepo.ReRunDeductions(payslip);
+            return Ok(updated_payslip);
         }
 
 

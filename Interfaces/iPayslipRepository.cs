@@ -18,5 +18,6 @@ namespace AJRAApis.Interfaces
         Task<IFormFile> GetPayslipPDFAsync(List<PayslipDto> payslips,string payslipcycle);
         Task<PayslipDto> UpdatePayslip(PaySlips payslip, string designation);
         Task<PayslipDto?> GetPayslipByIDAsync(string id);
+        Task<PayslipDeductionDto> ReRunDeductions(PayslipDeductionDto payslip);
     }
 }

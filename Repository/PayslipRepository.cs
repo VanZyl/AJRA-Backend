@@ -1221,6 +1221,56 @@ namespace AJRAApis.Repository
                 .FirstOrDefaultAsync();
 
         }
+        public Task<PayslipDeductionDto> ReRunDeductions(PayslipDeductionDto payslip)
+        {
+            int Year = payslip.PaySlipDate.Year;
+            int Month = payslip.PaySlipDate.Month;  
+
+            DateTime enddate = new DateTime(Year, Month, 23);
+            DateTime startdate = new DateTime(Year, Month, 24).AddMonths(-1);
+
+            var redlooklist = _context.Redbook.Where(r => r.EmployeeId == payslip.EmployeeId && r.Date >= startdate && r.Date <= enddate).ToList();
+            var uniforms = 0.0;
+            var tillshortage = 0.0;
+            var wastage = 0.0;
+            var otherdeductions = 0.0;
+            foreach (var entry in redlooklist)
+            {
+                uniforms += entry.Uniforms;
+                tillshortage += entry.TillShortage;
+                wastage += entry.Wastage;
+                otherdeductions += entry.OtherDeductions;
+            }
+            Console.WriteLine("Uniforms: " + uniforms);
+            Console.WriteLine("Till Shortage: " + tillshortage);
+            Console.WriteLine("Wastage: " + wastage);
+            Console.WriteLine("Other Deductions: " + otherdeductions);
+
+
+
+            var GrossIncome = Math.Round(payslip.GrossAmount,2,MidpointRounding.ToEven);
+
+            var UIF = Math.Round(GrossIncome * 0.01,2,MidpointRounding.ToEven);
+
+            var BargainingCouncil = 8.0;
+
+            var NetIncome = Math.Round(GrossIncome - UIF - BargainingCouncil - uniforms - tillshortage - wastage - otherdeductions,2,MidpointRounding.ToEven);
+
+            // Create a new instance of PayslipDeductionDto with the calculated values
+            var updatedPayslip = new PayslipDeductionDto
+            {
+                EmployeeId = payslip.EmployeeId,
+                GrossAmount = (float)GrossIncome,
+                Uniforms = (float)uniforms,
+                TillShortage = (float)tillshortage,
+                Wastages = (float)wastage,
+                OtherDeductions = (float)otherdeductions,
+                NetAmount = (float)NetIncome,
+                PaySlipDate = payslip.PaySlipDate
+            };
+            return Task.FromResult(updatedPayslip);
+
+        }
 
     }
 
