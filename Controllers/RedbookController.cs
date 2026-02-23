@@ -33,14 +33,34 @@ namespace AJRAApis.Controllers
         public async Task<IActionResult> Add([FromBody] RedbookDto redbook)
         {
             Console.WriteLine(redbook);
+            // Check if the input object is null and return a BadRequest response if it is.
+            if (redbook == null)
+            {
+                Console.WriteLine("Invalid redbook data.");
+                return BadRequest("Redbook data is empty.");
+            }
             var newRedbook = await _redbookRepo.AddAsync(redbook);
+            Console.WriteLine("Redbook entry added successfully.");
+            if (newRedbook == null)
+            {
+                Console.WriteLine("Failed to add redbook entry.");
+                return BadRequest("Failed to add redbook entry.");
+            }
             return Ok(newRedbook);
         }
 
         [HttpGet("summary")]
         public async Task<IActionResult> GetSummary([FromQuery] string employeeId, [FromQuery] string startdate, [FromQuery] string enddate)
         {
+            if (string.IsNullOrEmpty(employeeId) || string.IsNullOrEmpty(startdate) || string.IsNullOrEmpty(enddate))
+            {
+                return BadRequest("Employee ID, start date, and end date are required");
+            }
             var redbookSummary = await _redbookRepo.GetRedbookSummaryAsync(employeeId, startdate, enddate);
+            if (redbookSummary == null)
+            {
+                return NotFound("No redbook entries found for the specified criteria.");
+            }
             return Ok(redbookSummary);
         }
 
