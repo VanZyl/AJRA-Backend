@@ -197,7 +197,7 @@ namespace AJRAApis.Repository
 
                 float LeaveBF = _context.EmployeeLeave
                                 .Where(e => e.EmployeeId == employeeId)
-                                .OrderByDescending(e => e.Id)
+                                .OrderByDescending(e => Convert.ToInt32(e.Id)) // Order by Id in descending order
                                 .Select(e => e.DaysDue)
                                 .FirstOrDefault();
 
@@ -267,10 +267,14 @@ namespace AJRAApis.Repository
                         OvertimeAmountPaid = 0,
                         PublicHolidayHoursWorked = 0,
                         PublicHolidayAmountPaid = 0,
+                        Uniforms = (float)uniforms,
+                        TillShortage = (float)tillshortage,
+                        Wastages = (float)wastage,
+                        OtherDeductions = (float)otherdeductions,
                         GrossAmount = Salary,
                         UIFContribution = 0,
                         BarganingCouncil = 0,
-                        NetAmount = Salary,
+                        NetAmount = (float)(Salary -uniforms - tillshortage - wastage - otherdeductions),
                         LeaveAcc = 0,
                         LeaveBF = 0,
                         LeaveAmountPaid = 0,
@@ -294,7 +298,7 @@ namespace AJRAApis.Repository
             // Fetch all Payslip IDs for the employee
             var lastPayslip = _context.PaySlips
                 .Where(p => p.EmployeeId == employeeId)
-                .OrderByDescending(p => p.PaySlipCycle) // Ensure we get the latest one
+                .OrderByDescending(p => p.PaySlipDate) // Ensure we get the latest one
                 .Select(p => p.Id)
                 .FirstOrDefault();
 
@@ -668,6 +672,8 @@ namespace AJRAApis.Repository
                 (1, 1),   // New Year's Day
                 (3, 21),  // Human Rights Day
                 (4, 18),  // Good Friday
+                (4, 21),  // Family Day
+                (4, 27),  // Freedom Day
                 (4, 28),  // Freedom Day
                 (5, 1),   // Workers' Day
                 (6, 16),  // Youth Day
@@ -741,7 +747,8 @@ namespace AJRAApis.Repository
             // Find the last entry for the specific employee
             var lastEntry = _context.EmployeeLeave
                 .Where(l => l.EmployeeId == payslip.EmployeeId) // Filter for leave taken transactions
-                .OrderByDescending(l => l.Id) // Order by DateTo in descending order
+                .OrderByDescending(l => Convert.ToInt32(l.Id)) // Order by DateTo in descending order
+                .OrderByDescending(l => l.DateFrom) // Order by Id in descending order
                 .FirstOrDefault(); // Get the most recent entry or null if no records
 
             if (lastEntry != null)
@@ -756,7 +763,7 @@ namespace AJRAApis.Repository
             }
                             // Retrieve the maximum Id from the database.
             var lastId = _context.EmployeeLeave
-                                .OrderByDescending(el => el.Id) // Order by Id in descending order.
+                                .OrderByDescending(el => Convert.ToInt32(el.Id)) // Order by Id in descending order.
                                 .Select(el => int.Parse(el.Id)) // Parse the Id to an integer.
                                 .FirstOrDefault(); // Get the first (largest) Id.
 
@@ -792,7 +799,7 @@ namespace AJRAApis.Repository
                     page.Content()
                         .Column(column =>
                         {
-                            column.Spacing(10);
+                            column.Spacing(5);
 
                             // Header
                             column.Item().Row(row =>
@@ -800,9 +807,26 @@ namespace AJRAApis.Repository
                                 row.RelativeColumn().Text("AJRA INVESTMENTS PTY LTD").Bold().FontSize(18);
                             });
 
+                            // Company Details
                             column.Item().Row(row =>
                             {
-                                row.RelativeColumn().Text("DATE: " + payslip.PaySlipDate).FontSize(12);
+                                row.RelativeColumn().Text("Reg. Nr: 2021/942562/07").FontSize(9);
+                                row.ConstantColumn(100).AlignRight().Text("VAT Nr: 4250304484");
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("Trading As: Steers/Fishaways/Debonairs Queenswood").FontSize(9);
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("Shop 24/25/27 Queens Quaters, Queenswood, Pretoria, Gauteng, 0186").FontSize(9);
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("DATE: " + payslip.PaySlipDate).FontSize(10);
                                 row.ConstantColumn(100).AlignRight().Text(payslip.Id);
                             });
 
@@ -815,23 +839,23 @@ namespace AJRAApis.Repository
                                     details.Spacing(8);
                                     details.Item().Text(text =>
                                         {
-                                            text.Span("EMPLOYEE Name: ").Bold().FontSize(12);
-                                            text.Span(payslip.Name + " " + payslip.Surname).FontSize(12);
+                                            text.Span("EMPLOYEE Name: ").Bold().FontSize(11);
+                                            text.Span(payslip.Name + " " + payslip.Surname).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("DESIGNATION: ").Bold().FontSize(12);
-                                            text.Span(designation).FontSize(12);
+                                            text.Span("DESIGNATION: ").Bold().FontSize(11);
+                                            text.Span(designation).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("PERIOD: ").Bold().FontSize(12);
-                                            text.Span(payslip.PaySlipCycle).FontSize(12);
+                                            text.Span("PERIOD: ").Bold().FontSize(11);
+                                            text.Span(payslip.PaySlipCycle).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("HOURLY RATE: ").Bold().FontSize(12);
-                                            text.Span("R " + payslip.HourlyRate.ToString()).FontSize(12);
+                                            text.Span("HOURLY RATE: ").Bold().FontSize(11);
+                                            text.Span("R " + payslip.HourlyRate.ToString()).FontSize(11);
                                         });
                                 
                             });
@@ -842,7 +866,7 @@ namespace AJRAApis.Repository
                                 
 
                                 // Income Table
-                                income.Item().Text("INCOME").Bold().FontSize(12);
+                                income.Item().Text("INCOME").Bold().FontSize(11);
                                 income.Item().Table(table =>
                                 {
                                     
@@ -906,7 +930,7 @@ namespace AJRAApis.Repository
                                 deductions.Spacing(10);
 
                                 // Deductions
-                                deductions.Item().Text("DEDUCTIONS").Bold().FontSize(12);
+                                deductions.Item().Text("DEDUCTIONS").Bold().FontSize(11);
                                 deductions.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
@@ -956,7 +980,7 @@ namespace AJRAApis.Repository
                                 compnaycontributions.Spacing(10);
 
                                 // Deductions
-                                compnaycontributions.Item().Text("COMPANY CONTRIBUTIONS").Bold().FontSize(12);
+                                compnaycontributions.Item().Text("COMPANY CONTRIBUTIONS").Bold().FontSize(11);
                                 compnaycontributions.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
@@ -978,15 +1002,14 @@ namespace AJRAApis.Repository
                             column.Spacing(10);
 
                             // Nett Pay
-                            column.Item().Text("NETT PAY").Bold().FontSize(16).FontColor(Colors.Green.Darken2).AlignCenter();
-                            column.Item().Text("R " +payslip.NetAmount.ToString()).FontSize(18).Bold().AlignCenter();
+                            column.Item().Text("NETT PAY : R" +payslip.NetAmount.ToString()).Bold().FontSize(14).FontColor(Colors.Green.Darken2).AlignCenter();
 
 
                             column.Item().Border(1).BorderColor(Colors.Black).Padding(10).Column(leave =>{
                                 leave.Spacing(10);
 
                                 // Leave Balances
-                                leave.Item().Text("LEAVE BALANCES").Bold().FontSize(12);
+                                leave.Item().Text("LEAVE BALANCES").Bold().FontSize(11);
                                 leave.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
@@ -1021,20 +1044,20 @@ namespace AJRAApis.Repository
             })
             .GeneratePdf(filePath);
 
-              // Retrieve the maximum Id from the database.
-            var leaveid = _context.EmployeeLeave
-                .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
-                .ThenByDescending(el => el.Id)        // Then order lexicographically.
-                .Select(el => el.Id)                  // Select the Id as string.
-                .FirstOrDefault();                    // Get the first (largest) Id.
+            //   // Retrieve the maximum Id from the database.
+            // var leaveid = _context.EmployeeLeave
+            //     .OrderByDescending(el => el.Id.Length) // Order by length first for correct string comparison.
+            //     .ThenByDescending(el => el.Id)        // Then order lexicographically.
+            //     .Select(el => el.Id)                  // Select the Id as string.
+            //     .FirstOrDefault();                    // Get the first (largest) Id.
 
 
-            // Increment the Id.
-            var newleaveid = (int.Parse(leaveid) + 1).ToString(); // Convert the incremented Id back to a string.
+            // // Increment the Id.
+            // var newleaveid = (int.Parse(leaveid) + 1).ToString(); // Convert the incremented Id back to a string.
 
             var leaveentry = new EmployeeLeave
             {
-                Id = newleaveid,
+                Id = newId,
                 EmployeeId = payslip.EmployeeId,
                 TransCode = "001",
                 Description = "Leave Accured",
@@ -1042,7 +1065,7 @@ namespace AJRAApis.Repository
                 DateTo = DateOnly.Parse(enddate),
                 DaysAccrued = payslip.LeaveAcc,
                 DaysDue = (float)(payslip.LeaveBF + payslip.LeaveAcc),
-                DaysTaken = (int)payslip.LeaveTaken,
+                DaysTaken = 0,  // This value must be zero because leave taken is entered manually
                 Remarks = "Leave Accrued for the month of " + DateTime.Now.ToString("MMMM yyyy")
             };
 
@@ -1212,6 +1235,56 @@ namespace AJRAApis.Repository
                 .Where(p => p.Id == id)
                 .Select(p => p.ToPayslipDto())
                 .FirstOrDefaultAsync();
+
+        }
+        public Task<PayslipDeductionDto> ReRunDeductions(PayslipDeductionDto payslip)
+        {
+            int Year = payslip.PaySlipDate.Year;
+            int Month = payslip.PaySlipDate.Month;  
+
+            DateTime enddate = new DateTime(Year, Month, 23);
+            DateTime startdate = new DateTime(Year, Month, 24).AddMonths(-1);
+
+            var redlooklist = _context.Redbook.Where(r => r.EmployeeId == payslip.EmployeeId && r.Date >= startdate && r.Date <= enddate).ToList();
+            var uniforms = 0.0;
+            var tillshortage = 0.0;
+            var wastage = 0.0;
+            var otherdeductions = 0.0;
+            foreach (var entry in redlooklist)
+            {
+                uniforms += entry.Uniforms;
+                tillshortage += entry.TillShortage;
+                wastage += entry.Wastage;
+                otherdeductions += entry.OtherDeductions;
+            }
+            Console.WriteLine("Uniforms: " + uniforms);
+            Console.WriteLine("Till Shortage: " + tillshortage);
+            Console.WriteLine("Wastage: " + wastage);
+            Console.WriteLine("Other Deductions: " + otherdeductions);
+
+
+
+            var GrossIncome = Math.Round(payslip.GrossAmount,2,MidpointRounding.ToEven);
+
+            var UIF = Math.Round(GrossIncome * 0.01,2,MidpointRounding.ToEven);
+
+            var BargainingCouncil = 8.0;
+
+            var NetIncome = Math.Round(GrossIncome - UIF - BargainingCouncil - uniforms - tillshortage - wastage - otherdeductions,2,MidpointRounding.ToEven);
+
+            // Create a new instance of PayslipDeductionDto with the calculated values
+            var updatedPayslip = new PayslipDeductionDto
+            {
+                EmployeeId = payslip.EmployeeId,
+                GrossAmount = (float)GrossIncome,
+                Uniforms = (float)uniforms,
+                TillShortage = (float)tillshortage,
+                Wastages = (float)wastage,
+                OtherDeductions = (float)otherdeductions,
+                NetAmount = (float)NetIncome,
+                PaySlipDate = payslip.PaySlipDate
+            };
+            return Task.FromResult(updatedPayslip);
 
         }
 
