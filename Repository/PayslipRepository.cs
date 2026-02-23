@@ -799,7 +799,7 @@ namespace AJRAApis.Repository
                     page.Content()
                         .Column(column =>
                         {
-                            column.Spacing(10);
+                            column.Spacing(5);
 
                             // Header
                             column.Item().Row(row =>
@@ -807,9 +807,26 @@ namespace AJRAApis.Repository
                                 row.RelativeColumn().Text("AJRA INVESTMENTS PTY LTD").Bold().FontSize(18);
                             });
 
+                            // Company Details
                             column.Item().Row(row =>
                             {
-                                row.RelativeColumn().Text("DATE: " + payslip.PaySlipDate).FontSize(12);
+                                row.RelativeColumn().Text("Reg. Nr: 2021/942562/07").FontSize(9);
+                                row.ConstantColumn(100).AlignRight().Text("VAT Nr: 4250304484");
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("Trading As: Steers/Fishaways/Debonairs Queenswood").FontSize(9);
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("Shop 24/25/27 Queens Quaters, Queenswood, Pretoria, Gauteng, 0186").FontSize(9);
+                            });
+
+                            column.Item().Row(row =>
+                            {
+                                row.RelativeColumn().Text("DATE: " + payslip.PaySlipDate).FontSize(10);
                                 row.ConstantColumn(100).AlignRight().Text(payslip.Id);
                             });
 
@@ -822,23 +839,23 @@ namespace AJRAApis.Repository
                                     details.Spacing(8);
                                     details.Item().Text(text =>
                                         {
-                                            text.Span("EMPLOYEE Name: ").Bold().FontSize(12);
-                                            text.Span(payslip.Name + " " + payslip.Surname).FontSize(12);
+                                            text.Span("EMPLOYEE Name: ").Bold().FontSize(11);
+                                            text.Span(payslip.Name + " " + payslip.Surname).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("DESIGNATION: ").Bold().FontSize(12);
-                                            text.Span(designation).FontSize(12);
+                                            text.Span("DESIGNATION: ").Bold().FontSize(11);
+                                            text.Span(designation).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("PERIOD: ").Bold().FontSize(12);
-                                            text.Span(payslip.PaySlipCycle).FontSize(12);
+                                            text.Span("PERIOD: ").Bold().FontSize(11);
+                                            text.Span(payslip.PaySlipCycle).FontSize(11);
                                         });
                                         details.Item().Text(text =>
                                         {
-                                            text.Span("HOURLY RATE: ").Bold().FontSize(12);
-                                            text.Span("R " + payslip.HourlyRate.ToString()).FontSize(12);
+                                            text.Span("HOURLY RATE: ").Bold().FontSize(11);
+                                            text.Span("R " + payslip.HourlyRate.ToString()).FontSize(11);
                                         });
                                 
                             });
@@ -849,7 +866,7 @@ namespace AJRAApis.Repository
                                 
 
                                 // Income Table
-                                income.Item().Text("INCOME").Bold().FontSize(12);
+                                income.Item().Text("INCOME").Bold().FontSize(11);
                                 income.Item().Table(table =>
                                 {
                                     
@@ -913,7 +930,7 @@ namespace AJRAApis.Repository
                                 deductions.Spacing(10);
 
                                 // Deductions
-                                deductions.Item().Text("DEDUCTIONS").Bold().FontSize(12);
+                                deductions.Item().Text("DEDUCTIONS").Bold().FontSize(11);
                                 deductions.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
@@ -963,7 +980,7 @@ namespace AJRAApis.Repository
                                 compnaycontributions.Spacing(10);
 
                                 // Deductions
-                                compnaycontributions.Item().Text("COMPANY CONTRIBUTIONS").Bold().FontSize(12);
+                                compnaycontributions.Item().Text("COMPANY CONTRIBUTIONS").Bold().FontSize(11);
                                 compnaycontributions.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
@@ -985,15 +1002,14 @@ namespace AJRAApis.Repository
                             column.Spacing(10);
 
                             // Nett Pay
-                            column.Item().Text("NETT PAY").Bold().FontSize(16).FontColor(Colors.Green.Darken2).AlignCenter();
-                            column.Item().Text("R " +payslip.NetAmount.ToString()).FontSize(18).Bold().AlignCenter();
+                            column.Item().Text("NETT PAY : R" +payslip.NetAmount.ToString()).Bold().FontSize(14).FontColor(Colors.Green.Darken2).AlignCenter();
 
 
                             column.Item().Border(1).BorderColor(Colors.Black).Padding(10).Column(leave =>{
                                 leave.Spacing(10);
 
                                 // Leave Balances
-                                leave.Item().Text("LEAVE BALANCES").Bold().FontSize(12);
+                                leave.Item().Text("LEAVE BALANCES").Bold().FontSize(11);
                                 leave.Item().Table(table =>
                                 {
                                     table.ColumnsDefinition(columns =>
